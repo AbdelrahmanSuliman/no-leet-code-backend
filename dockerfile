@@ -2,7 +2,7 @@
 FROM maven:3.9.6-eclipse-temurin-17-focal AS build
 WORKDIR /app
 
-# Copy pom.xml and download dependencies
+# Copy pom.xml and download dependencies (only when pom.xml changes)
 COPY pom.xml .
 RUN mvn dependency:go-offline
 
