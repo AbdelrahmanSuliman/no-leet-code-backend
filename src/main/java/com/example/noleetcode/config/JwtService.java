@@ -1,5 +1,6 @@
 package com.example.noleetcode.config;
 
+import com.example.noleetcode.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -9,10 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.security.Key;
-import java.time.Instant;
 import java.util.Date;
 import java.util.function.Function;
 import java.util.concurrent.TimeUnit;
+import javax.crypto.spec.SecretKeySpec;
 
 @Service
 public class JwtService {
@@ -24,15 +25,22 @@ public class JwtService {
 
     private static final long VALIDITY = TimeUnit.MINUTES.toMillis(60);
 
-    public String generateToken(UserDetails userDetails) {
+    // Create a Key from the secret key (HMAC)
+    private Key getSigningKey() {
+        return new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS256.getJcaName());
+    }
+
+    public String generateToken(User user) {
+        Key signingKey = getSigningKey();
+
         String token = Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(Instant.now().plusMillis(VALIDITY)))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + VALIDITY))
+                .signWith(signingKey)
                 .compact();
 
-        logger.info("Generated JWT for user: {}", userDetails.getUsername());
+        logger.info("Generated JWT for user: {}", user.getUsername());
         return token;
     }
 
@@ -60,8 +68,9 @@ public class JwtService {
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey)
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
         return claimsResolver.apply(claims);

@@ -29,7 +29,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Submission> submissions;
 
-    @Enumerated(EnumType.STRING) 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role = Role.USER;
 
     @ManyToMany
@@ -46,12 +47,11 @@ public class User {
     @Column
     private ZonedDateTime updatedAt = ZonedDateTime.now();
 
-    public User(String username, String email, String password, List<Submission> submissions, List<Problem> problems) {
+    public User(String username, String email, String password) {
         this.username = username;
+        this.uuid = UUID.randomUUID();
         this.email = email;
         this.password = password;
-        this.submissions = submissions;
-        this.problems = problems;
     }
     public User() {
         this.uuid = UUID.randomUUID();
@@ -63,6 +63,14 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public UUID getUuid() {

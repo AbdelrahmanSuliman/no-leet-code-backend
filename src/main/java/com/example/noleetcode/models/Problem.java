@@ -34,7 +34,7 @@ public class Problem {
     @JoinTable(
             name = "problem_tags",
             joinColumns = @JoinColumn(name = "problem_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_type"))
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private List<Tag> tags;
 
     @OneToMany(mappedBy = "problem")
@@ -54,6 +54,7 @@ public class Problem {
 
     public Problem(String title, String description, Difficulty difficulty, List<User> users, List<Tag> tags, List<TestCase> testCases, String solution, Long authorId) {
         this.title = title;
+        this.uuid = UUID.randomUUID();
         this.description = description;
         this.difficulty = difficulty;
         this.users = users;
