@@ -45,6 +45,7 @@ public class Submission {
 
     public Submission(Status status, Language language, String code, Problem problem) {
         this.status = status;
+        this.uuid = UUID.randomUUID();
         this.language = language;
         this.code = code;
         this.problem = problem;
