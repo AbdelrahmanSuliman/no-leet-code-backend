@@ -1,5 +1,6 @@
 package com.example.noleetcode.models;
 
+import com.example.noleetcode.enums.Role;
 import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
@@ -27,6 +28,9 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Submission> submissions;
+
+    @Enumerated(EnumType.STRING) 
+    private Role role = Role.USER;
 
     @ManyToMany
     @JoinTable(
