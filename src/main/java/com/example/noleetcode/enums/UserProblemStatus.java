@@ -1,6 +1,6 @@
 package com.example.noleetcode.enums;
 
-public enum ProblemStatus {
+public enum UserProblemStatus {
     ATTEMPTED,
     SOLVED,
     FAILED

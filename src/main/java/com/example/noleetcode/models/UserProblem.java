@@ -1,7 +1,6 @@
 package com.example.noleetcode.models;
 
-import com.example.noleetcode.enums.ProblemStatus;
-import com.example.noleetcode.enums.ProblemStatus;
+import com.example.noleetcode.enums.UserProblemStatus;
 import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
@@ -30,7 +29,7 @@ public class UserProblem {
     private Integer numberOfAttempts = 0;
 
     @Column
-    private ProblemStatus lastSubmissionStatus;
+    private UserProblemStatus lastSubmissionStatus;
 
     @Column
     private ZonedDateTime firstAttemptedAt;
@@ -43,7 +42,7 @@ public class UserProblem {
 
     public UserProblem() {}
 
-    public UserProblem(List<Submission> submissions, ProblemStatus lastSubmissionStatus, Integer numberOfAttempts, boolean solved, Problem problem, User user) {
+    public UserProblem(List<Submission> submissions, UserProblemStatus lastSubmissionStatus, Integer numberOfAttempts, boolean solved, Problem problem, User user) {
         this.submissions = submissions;
         this.lastSubmissionStatus = lastSubmissionStatus;
         this.numberOfAttempts = numberOfAttempts;
@@ -92,11 +91,11 @@ public class UserProblem {
         this.numberOfAttempts = numberOfAttempts;
     }
 
-    public ProblemStatus getLastSubmissionStatus() {
+    public UserProblemStatus getLastSubmissionStatus() {
         return lastSubmissionStatus;
     }
 
-    public void setLastSubmissionStatus(ProblemStatus lastSubmissionStatus) {
+    public void setLastSubmissionStatus(UserProblemStatus lastSubmissionStatus) {
         this.lastSubmissionStatus = lastSubmissionStatus;
     }
 
