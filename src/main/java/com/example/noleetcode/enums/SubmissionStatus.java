@@ -1,6 +1,6 @@
 package com.example.noleetcode.enums;
 
-public enum Status {
+public enum SubmissionStatus {
     PENDING,
     ACCEPTED,
     REJECTED,

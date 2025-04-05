@@ -33,13 +33,8 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.USER;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_problems",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "problem_id")
-    )
-    private List<Problem> problems;
+    @OneToMany(mappedBy = "user")
+    private List<UserProblem> userProblems;
 
     @Column
     private ZonedDateTime createdAt = ZonedDateTime.now();
@@ -113,12 +108,12 @@ public class User {
         this.submissions = submissions;
     }
 
-    public List<Problem> getProblems() {
-        return problems;
+    public List<UserProblem> getUserProblems() {
+        return userProblems;
     }
 
-    public void setProblems(List<Problem> problems) {
-        this.problems = problems;
+    public void setUserProblems(List<UserProblem> userProblems) {
+        this.userProblems = userProblems;
     }
 
     public ZonedDateTime getCreatedAt() {

@@ -27,8 +27,8 @@ public class Problem {
     @Column(nullable = false)
     private Difficulty difficulty;
 
-    @ManyToMany(mappedBy = "problems")
-    private List<User> users;
+    @OneToMany(mappedBy = "problem")
+    private List<UserProblem> userProblems;
 
     @ManyToMany
     @JoinTable(
@@ -43,8 +43,10 @@ public class Problem {
     @Column(nullable = false)
     private String solution;
 
-    @Column(nullable = false)
-    private Long authorId;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private User author;
+
 
     @Column
     private ZonedDateTime createdAt = ZonedDateTime.now();
@@ -52,16 +54,16 @@ public class Problem {
     @Column
     private ZonedDateTime updatedAt = ZonedDateTime.now();
 
-    public Problem(String title, String description, Difficulty difficulty, List<User> users, List<Tag> tags, List<TestCase> testCases, String solution, Long authorId) {
+    public Problem(String title, String description, Difficulty difficulty, List<UserProblem> userProblems, List<Tag> tags, List<TestCase> testCases, String solution, User author) {
         this.title = title;
         this.uuid = UUID.randomUUID();
         this.description = description;
         this.difficulty = difficulty;
-        this.users = users;
+        this.userProblems = userProblems;
         this.tags = tags;
         this.testCases = testCases;
         this.solution = solution;
-        this.authorId = authorId;
+        this.author = author;
     }
 
     public Problem() {
@@ -84,12 +86,12 @@ public class Problem {
         this.createdAt = createdAt;
     }
 
-    public Long getAuthorId() {
-        return authorId;
+    public User getAuthorId() {
+        return author;
     }
 
-    public void setAuthorId(Long authorId) {
-        this.authorId = authorId;
+    public void setAuthorId(User author) {
+        this.author = author;
     }
 
     public String getSolution() {
@@ -116,13 +118,14 @@ public class Problem {
         this.tags = tags;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public List<UserProblem> getUsers() {
+        return userProblems;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public void setUserProblems(List<UserProblem> userProblems) {
+        this.userProblems = userProblems;
     }
+
 
     public Difficulty getDifficulty() {
         return difficulty;

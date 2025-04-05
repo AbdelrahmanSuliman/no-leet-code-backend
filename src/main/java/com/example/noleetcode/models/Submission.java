@@ -1,7 +1,7 @@
 package com.example.noleetcode.models;
 
 import com.example.noleetcode.enums.Language;
-import com.example.noleetcode.enums.Status;
+import com.example.noleetcode.enums.SubmissionStatus;
 import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
@@ -22,8 +22,8 @@ public class Submission {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "problem_id")
-    private Problem problem;
+    @JoinColumn(name = "user_problem_id")
+    private UserProblem userProblem;
 
     @Column(nullable = false)
     private String code;
@@ -32,7 +32,11 @@ public class Submission {
     private Language language;
 
     @Column
-    private Status status;
+    private SubmissionStatus SubmissionStatus;
+
+    @ManyToOne
+    @JoinColumn(name = "problem_id")
+    private Problem problem;
 
     @Column
     private Long timeTaken;
@@ -43,8 +47,8 @@ public class Submission {
     @Column
     private ZonedDateTime submittedAt = ZonedDateTime.now();
 
-    public Submission(Status status, Language language, String code, Problem problem) {
-        this.status = status;
+    public Submission(SubmissionStatus status, Language language, String code, Problem problem) {
+        this.SubmissionStatus = status;
         this.uuid = UUID.randomUUID();
         this.language = language;
         this.code = code;
@@ -103,12 +107,12 @@ public class Submission {
         this.language = language;
     }
 
-    public Status getStatus() {
-        return status;
+    public SubmissionStatus getSubmissionStatus() {
+        return SubmissionStatus;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setSubmissionStatus(SubmissionStatus status) {
+        this.SubmissionStatus = status;
     }
 
     public Long getTimeTaken() {
