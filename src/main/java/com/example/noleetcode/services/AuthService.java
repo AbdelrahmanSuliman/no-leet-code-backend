@@ -1,21 +1,18 @@
 package com.example.noleetcode.services;
 
+import com.example.noleetcode.config.AppConfig;
 import com.example.noleetcode.config.JwtService;
 import com.example.noleetcode.config.SecurityConfig;
+import com.example.noleetcode.dto.LoginUserDto;
 import com.example.noleetcode.dto.RegisterUserDto;
 import com.example.noleetcode.exception.ApplicationException;
-import com.example.noleetcode.models.Problem;
-import com.example.noleetcode.models.Submission;
 import com.example.noleetcode.models.User;
 import com.example.noleetcode.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class AuthService {
@@ -24,14 +21,14 @@ public class AuthService {
 
 
     private final UserRepository userRepository;
-    private final SecurityConfig securityConfig;
     private final JwtService jwtService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
 
-    public AuthService(UserRepository userRepository, SecurityConfig securityConfig, JwtService jwtService) {
+    public AuthService(UserRepository userRepository, SecurityConfig securityConfig, JwtService jwtService, AppConfig appConfig, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.securityConfig = securityConfig;
         this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public String register(RegisterUserDto registerUserDto) {
@@ -40,22 +37,39 @@ public class AuthService {
             throw new ApplicationException("Username already in use", HttpStatus.CONFLICT);
         }
 
+        String encryptedPassword = passwordEncoder.encode(registerUserDto.password());
 
         // Save the user
         User user = new User(
                 registerUserDto.username(),
                 registerUserDto.email(),
-                registerUserDto.password()
-
+                encryptedPassword
         );
         userRepository.save(user);
 
         // Generate JWT token
-        String token = jwtService.generateToken(user);
 
         // Return the token in the response
-        return token; // AuthResponse is a custom class to send the token back
+        return jwtService.generateToken(user);
     }
+
+    public String login(LoginUserDto loginUserDto) {
+        User user = userRepository.findByEmailOrUsername(
+                loginUserDto.login(), loginUserDto.login()
+        ).orElseThrow(() -> {
+            logger.warn("User with email or username {} not found", loginUserDto.login());
+            return new ApplicationException("User not found", HttpStatus.NOT_FOUND);
+        });
+
+        if (!passwordEncoder.matches(loginUserDto.password(), user.getPassword())) {
+            logger.warn("User with email or username {} has incorrect password", loginUserDto.login());
+            throw new ApplicationException("Wrong password", HttpStatus.UNAUTHORIZED);
+        }
+
+        return jwtService.generateToken(user);
+    }
+
+
 
     public User getCurrentUser(String username) {
         return userRepository.findByUsername(username)
