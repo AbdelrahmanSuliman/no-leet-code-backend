@@ -4,6 +4,7 @@ import com.example.noleetcode.enums.Difficulty;
 import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,24 +28,26 @@ public class Problem {
     @Column(nullable = false)
     private Difficulty difficulty;
 
-    @ManyToMany(mappedBy = "problems")
-    private List<User> users;
+    @OneToMany(mappedBy = "problem")
+    private List<UserProblem> userProblems = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
             name = "problem_tags",
             joinColumns = @JoinColumn(name = "problem_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private List<Tag> tags;
+    private List<Tag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "problem")
-    private List<TestCase> testCases;
+    private List<TestCase> testCases = new ArrayList<>();
 
     @Column(nullable = false)
     private String solution;
 
-    @Column(nullable = false)
-    private Long authorId;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private User author;
+
 
     @Column
     private ZonedDateTime createdAt = ZonedDateTime.now();
@@ -52,16 +55,15 @@ public class Problem {
     @Column
     private ZonedDateTime updatedAt = ZonedDateTime.now();
 
-    public Problem(String title, String description, Difficulty difficulty, List<User> users, List<Tag> tags, List<TestCase> testCases, String solution, Long authorId) {
-        this.title = title;
+    public Problem(String title, String description, User author) {
         this.uuid = UUID.randomUUID();
+        this.title = title;
         this.description = description;
-        this.difficulty = difficulty;
-        this.users = users;
-        this.tags = tags;
-        this.testCases = testCases;
-        this.solution = solution;
-        this.authorId = authorId;
+        this.author = author;
+        this.difficulty = Difficulty.EASY;
+        this.solution = "Solution not provided yet.";
+        this.createdAt = ZonedDateTime.now();
+        this.updatedAt = ZonedDateTime.now();
     }
 
     public Problem() {
@@ -84,12 +86,12 @@ public class Problem {
         this.createdAt = createdAt;
     }
 
-    public Long getAuthorId() {
-        return authorId;
+    public User getAuthorId() {
+        return author;
     }
 
-    public void setAuthorId(Long authorId) {
-        this.authorId = authorId;
+    public void setAuthorId(User author) {
+        this.author = author;
     }
 
     public String getSolution() {
@@ -116,12 +118,12 @@ public class Problem {
         this.tags = tags;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public List<UserProblem> getUsers() {
+        return userProblems;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public void setUserProblems(List<UserProblem> userProblems) {
+        this.userProblems = userProblems;
     }
 
     public Difficulty getDifficulty() {

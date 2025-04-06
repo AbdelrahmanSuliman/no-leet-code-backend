@@ -2,14 +2,17 @@ package com.example.noleetcode.models;
 
 import com.example.noleetcode.enums.Role;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,13 +36,8 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.USER;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_problems",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "problem_id")
-    )
-    private List<Problem> problems;
+    @OneToMany(mappedBy = "user")
+    private List<UserProblem> userProblems;
 
     @Column
     private ZonedDateTime createdAt = ZonedDateTime.now();
@@ -85,6 +83,26 @@ public class User {
         return username;
     }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -95,6 +113,11 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
     }
 
     public String getPassword() {
@@ -113,12 +136,12 @@ public class User {
         this.submissions = submissions;
     }
 
-    public List<Problem> getProblems() {
-        return problems;
+    public List<UserProblem> getUserProblems() {
+        return userProblems;
     }
 
-    public void setProblems(List<Problem> problems) {
-        this.problems = problems;
+    public void setUserProblems(List<UserProblem> userProblems) {
+        this.userProblems = userProblems;
     }
 
     public ZonedDateTime getCreatedAt() {

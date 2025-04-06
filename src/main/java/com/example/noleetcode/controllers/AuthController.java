@@ -1,5 +1,6 @@
 package com.example.noleetcode.controllers;
 
+import com.example.noleetcode.Responses.UserResponse;
 import com.example.noleetcode.dto.LoginUserDto;
 import com.example.noleetcode.dto.RegisterUserDto;
 import com.example.noleetcode.models.User;
@@ -10,8 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,14 +31,8 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterUserDto registerUserDto, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()) {
-            List<String> errorMessages = bindingResult.getAllErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .toList();
-            return ResponseEntity.badRequest().body(errorMessages);
-        }
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterUserDto registerUserDto) {
+
         String token = String.valueOf(authService.register(registerUserDto));
         return ResponseEntity.ok(token);
     }
@@ -49,27 +43,6 @@ public class AuthController {
         return ResponseEntity.ok(token);
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<User> getCurrentUser(Authentication authentication) {
-        // Log the authentication object for debugging
-        logger.debug("Authentication: {}", authentication);
-
-        if (authentication == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // Unauthorized if authentication is null
-        }
-
-        // Extract the username from the Authentication object
-        String username = authentication.getName();
-
-        // Log the extracted username
-        logger.debug("Authenticated username: {}", username);
-
-        // Find the user by the username
-        User user = authService.getCurrentUser(username);
-
-        // Return the user details
-        return ResponseEntity.ok(user);
-    }
 
 
 }

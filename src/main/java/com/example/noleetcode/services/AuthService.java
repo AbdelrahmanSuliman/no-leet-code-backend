@@ -54,15 +54,15 @@ public class AuthService {
     }
 
     public String login(LoginUserDto loginUserDto) {
-        User user = userRepository.findByEmailOrUsername(
-                loginUserDto.login(), loginUserDto.login()
+        User user = userRepository.findByUsername(
+                loginUserDto.username()
         ).orElseThrow(() -> {
-            logger.warn("User with email or username {} not found", loginUserDto.login());
+            logger.warn("User with username {} not found", loginUserDto.username());
             return new ApplicationException("User not found", HttpStatus.NOT_FOUND);
         });
 
         if (!passwordEncoder.matches(loginUserDto.password(), user.getPassword())) {
-            logger.warn("User with email or username {} has incorrect password", loginUserDto.login());
+            logger.warn("User with username {} has incorrect password", loginUserDto.username());
             throw new ApplicationException("Wrong password", HttpStatus.UNAUTHORIZED);
         }
 
@@ -70,11 +70,6 @@ public class AuthService {
     }
 
 
-
-    public User getCurrentUser(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ApplicationException("User not found", HttpStatus.NOT_FOUND));
-    }
 
 
 }
