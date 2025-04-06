@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -23,9 +24,11 @@ public class SecurityConfig {
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     private final JwtAuthFilter jwtAuthenticationFilter;
+    private final AuthenticationProvider authenticationProvider;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthFilter jwtAuthenticationFilter, AuthenticationProvider authenticationProvider) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.authenticationProvider = authenticationProvider;
     }
 
     @Bean
@@ -33,22 +36,23 @@ public class SecurityConfig {
         logger.info("Configuring SecurityFilterChain");
 
         http
-                .csrf(csrf -> csrf.disable())  // Disabling CSRF for stateless authentication
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // Enabling CORS
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> {
                     logger.info("Configuring authorization rules");
-
-                    // Public endpoints for authentication
                     authorize
-                            .requestMatchers("/api/v1/auth/**")  // Open for signup and login
-                            .permitAll()
-
-                            // Secure all other endpoints, requiring authentication
+                            // Public endpoints for authentication
+                            .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+                            // Secure API endpoints
+                            .requestMatchers("/api/v1/**").authenticated()
+                            // Secure all other endpoints
                             .anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless authentication (JWT)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // JWT filter
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // Make sure the AuthenticationProvider is configured if you are using it directly
+                .authenticationProvider(authenticationProvider) // Ensure authenticationProvider bean exists and is injected
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
