@@ -4,6 +4,7 @@ import com.example.noleetcode.enums.Difficulty;
 import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,17 +29,17 @@ public class Problem {
     private Difficulty difficulty;
 
     @OneToMany(mappedBy = "problem")
-    private List<UserProblem> userProblems;
+    private List<UserProblem> userProblems = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
             name = "problem_tags",
             joinColumns = @JoinColumn(name = "problem_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private List<Tag> tags;
+    private List<Tag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "problem")
-    private List<TestCase> testCases;
+    private List<TestCase> testCases = new ArrayList<>();
 
     @Column(nullable = false)
     private String solution;
@@ -54,16 +55,15 @@ public class Problem {
     @Column
     private ZonedDateTime updatedAt = ZonedDateTime.now();
 
-    public Problem(String title, String description, Difficulty difficulty, List<UserProblem> userProblems, List<Tag> tags, List<TestCase> testCases, String solution, User author) {
-        this.title = title;
+    public Problem(String title, String description, User author) {
         this.uuid = UUID.randomUUID();
+        this.title = title;
         this.description = description;
-        this.difficulty = difficulty;
-        this.userProblems = userProblems;
-        this.tags = tags;
-        this.testCases = testCases;
-        this.solution = solution;
         this.author = author;
+        this.difficulty = Difficulty.EASY;
+        this.solution = "Solution not provided yet.";
+        this.createdAt = ZonedDateTime.now();
+        this.updatedAt = ZonedDateTime.now();
     }
 
     public Problem() {
@@ -125,7 +125,6 @@ public class Problem {
     public void setUserProblems(List<UserProblem> userProblems) {
         this.userProblems = userProblems;
     }
-
 
     public Difficulty getDifficulty() {
         return difficulty;
