@@ -55,7 +55,12 @@ public class Problem {
     @Column
     private ZonedDateTime updatedAt = ZonedDateTime.now();
 
-    public Problem(String title, String description, User author) {
+    public Problem(String title,
+                   String description,
+                   Difficulty difficulty,
+                   List<Tag> tags,
+                   String solution,
+                   User author) {
         this.uuid = UUID.randomUUID();
         this.title = title;
         this.description = description;

@@ -43,6 +43,9 @@ public class ProblemService {
         Problem problem = new Problem(
                 createProblemDto.title(),
                 createProblemDto.description(),
+                createProblemDto.difficulty(),
+                createProblemDto.tags(),
+                createProblemDto.solution(),
                 author
         );
 
