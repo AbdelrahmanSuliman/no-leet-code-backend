@@ -4,9 +4,7 @@ import com.example.noleetcode.enums.Difficulty;
 import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "problems")
@@ -19,12 +17,13 @@ public class Problem {
     @Column(nullable = false, unique = true, updatable = false)
     private UUID uuid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String title;
 
     @Column(nullable = false)
     private String description;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Difficulty difficulty;
 
@@ -36,7 +35,7 @@ public class Problem {
             name = "problem_tags",
             joinColumns = @JoinColumn(name = "problem_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private List<Tag> tags = new ArrayList<>();
+    private Set<Tag> tags = new HashSet<>();
 
     @OneToMany(mappedBy = "problem")
     private List<TestCase> testCases = new ArrayList<>();

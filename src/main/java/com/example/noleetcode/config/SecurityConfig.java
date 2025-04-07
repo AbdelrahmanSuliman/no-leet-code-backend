@@ -43,6 +43,8 @@ public class SecurityConfig {
                     authorize
                             // Public endpoints for authentication
                             .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+
+                            .requestMatchers("/api/v1/problem/add").hasAuthority("ROLE_ADMIN")
                             // Secure API endpoints
                             .requestMatchers("/api/v1/**").authenticated()
                             // Secure all other endpoints
