@@ -22,11 +22,14 @@ public class Tag {
 
     public Tag() {}
 
-    public Tag(TagType tagType, List<Problem> problems) {
+    /**
+     * Constructor for creating a Tag with only its type.
+     * Used for initializing tags from the enum.
+     * @param tagType The type of the tag.
+     */
+    public Tag(TagType tagType) {
         this.tagType = tagType;
-        this.problems = problems;
     }
-
     public TagType getTagType() {
         return tagType;
     }

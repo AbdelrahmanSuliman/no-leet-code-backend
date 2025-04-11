@@ -1,6 +1,7 @@
 package com.example.noleetcode.dto;
 
 import com.example.noleetcode.enums.Difficulty;
+import com.example.noleetcode.enums.TagType;
 import com.example.noleetcode.models.Tag;
 import com.example.noleetcode.models.TestCase;
 import com.example.noleetcode.models.User;
@@ -13,7 +14,7 @@ public record CreateProblemDto(
         String title,
         String description,
         Difficulty difficulty,
-        List<Tag> tags,
-        List<TestCase> testCases,
+        List<TagType> tags,
+        List<CreateTestCaseDto> testCases,
         String solution) {
 }

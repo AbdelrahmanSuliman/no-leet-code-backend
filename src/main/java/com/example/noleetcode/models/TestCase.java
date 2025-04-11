@@ -1,7 +1,9 @@
 package com.example.noleetcode.models;
 
+import com.example.noleetcode.config.ObjectListConverter;
 import jakarta.persistence.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -11,24 +13,45 @@ public class TestCase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // Internal ID
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, updatable = false) // Added updatable = false assuming UUID is set once
     private UUID uuid;
 
-    @Column(nullable = false)
-    private String input;
+    // Removed @ElementCollection
+    @Column(nullable = false, columnDefinition = "TEXT") // Use TEXT or jsonb for PostgreSQL
+    @Convert(converter = ObjectListConverter.class)  // Keep the converter
+    private List<Object> input;
 
-    @Column(nullable = false)
-    private String output;
+    // Removed @ElementCollection
+    @Column(nullable = false, columnDefinition = "TEXT") // Use TEXT or jsonb for PostgreSQL
+    @Convert(converter = ObjectListConverter.class)  // Keep the converter
+    private List<Object> output;
 
     @ManyToOne
     @JoinColumn(name = "problem_id")
     private Problem problem;
 
-    public TestCase(String output, Problem problem) {
-        this.output = output;
-        this.problem = problem;
+    // Ensure a default constructor and potentially one setting the UUID
+    public TestCase() {
+        this.uuid = UUID.randomUUID(); // Initialize UUID here or ensure it's set elsewhere
     }
-    public TestCase() {}
+    public TestCase(List<Object> input, List<Object> output) {
+        this(); // Call default constructor to set UUID
+        this.input = input;
+        this.output = output;
+    }
+
+    // Make sure problem is set when creating TestCase instance in ProblemService
+    // Add pre-persist logic if needed or ensure UUID is set before saving
+
+    @PrePersist // Ensure UUID is set before persisting if not done elsewhere
+    public void ensureUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
+    }
+
+
+    // Getters and Setters remain the same...
 
     public Long getId() {
         return id;
@@ -46,19 +69,19 @@ public class TestCase {
         this.uuid = uuid;
     }
 
-    public String getInput() {
+    public List<Object> getInput() {
         return input;
     }
 
-    public void setInput(String input) {
+    public void setInput(List<Object> input) {
         this.input = input;
     }
 
-    public String getOutput() {
+    public List<Object> getOutput() {
         return output;
     }
 
-    public void setOutput(String output) {
+    public void setOutput(List<Object> output) {
         this.output = output;
     }
 
