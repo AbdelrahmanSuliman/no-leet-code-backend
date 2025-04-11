@@ -58,14 +58,17 @@ public class Problem {
                    String description,
                    Difficulty difficulty,
                    List<Tag> tags,
+                   List<TestCase> testCases,
                    String solution,
                    User author) {
+        this.difficulty = difficulty;
+        this.testCases = testCases;
+        this.tags.addAll(tags);
+        this.solution = solution;
         this.uuid = UUID.randomUUID();
         this.title = title;
         this.description = description;
         this.author = author;
-        this.difficulty = Difficulty.EASY;
-        this.solution = "Solution not provided yet.";
         this.createdAt = ZonedDateTime.now();
         this.updatedAt = ZonedDateTime.now();
     }
@@ -114,11 +117,11 @@ public class Problem {
         this.testCases = testCases;
     }
 
-    public List<Tag> getTags() {
+    public Set<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(Set<Tag> tags) {
         this.tags = tags;
     }
 
@@ -168,5 +171,17 @@ public class Problem {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public List<UserProblem> getUserProblems() {
+        return userProblems;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
     }
 }

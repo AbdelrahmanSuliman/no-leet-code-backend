@@ -47,8 +47,9 @@ public class Submission {
     @Column
     private ZonedDateTime submittedAt = ZonedDateTime.now();
 
-    public Submission(SubmissionStatus status, Language language, String code, Problem problem) {
+    public Submission(SubmissionStatus status, Language language, UserProblem userProblem, String code, Problem problem) {
         this.SubmissionStatus = status;
+        this.userProblem = userProblem;
         this.uuid = UUID.randomUUID();
         this.language = language;
         this.code = code;
