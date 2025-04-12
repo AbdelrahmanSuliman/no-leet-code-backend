@@ -25,7 +25,7 @@ public class Submission {
     @JoinColumn(name = "user_problem_id")
     private UserProblem userProblem;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String code;
 
     @Column(nullable = false)
@@ -44,6 +44,9 @@ public class Submission {
     @Column
     private Long memoryUsed;
 
+    @Column(columnDefinition = "TEXT")
+    private String failureReason;
+
     @Column
     private ZonedDateTime submittedAt = ZonedDateTime.now();
 
@@ -58,6 +61,14 @@ public class Submission {
 
     public Submission() {
         this.uuid = UUID.randomUUID();
+    }
+
+    public String getFailureReason() {
+        return failureReason;
+    }
+
+    public void setFailureReason(String failureReason) {
+        this.failureReason = failureReason;
     }
 
     public Long getId() {
@@ -138,5 +149,13 @@ public class Submission {
 
     public void setSubmittedAt(ZonedDateTime submittedAt) {
         this.submittedAt = submittedAt;
+    }
+
+    public UserProblem getUserProblem() {
+        return userProblem;
+    }
+
+    public void setUserProblem(UserProblem userProblem) {
+        this.userProblem = userProblem;
     }
 }

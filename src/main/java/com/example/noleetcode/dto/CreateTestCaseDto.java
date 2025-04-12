@@ -1,8 +1,8 @@
-package com.example.noleetcode.dto;
+    package com.example.noleetcode.dto;
 
-import java.util.List;
+    import java.util.List;
 
-public record CreateTestCaseDto(
-         List<Object> input,
-         List<Object> output
-) {}
+    public record CreateTestCaseDto(
+             List<Object> input,
+             List<Object> output
+    ) {}

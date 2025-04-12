@@ -1,6 +1,7 @@
 package com.example.noleetcode.services;
 
 import com.example.noleetcode.Responses.*;
+import com.example.noleetcode.dto.UpdateProblemDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.example.noleetcode.config.JwtService;
 import com.example.noleetcode.dto.CreateProblemDto;
@@ -26,6 +27,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -181,16 +184,34 @@ public class ProblemService {
         problemRepository.delete(problem);
     }
 
-    public void updateProblem(UUID problemId){
+    public void updateProblem(UUID problemId, UpdateProblemDto updatedProblem){
         logger.info("Updating problem: {}", problemId);
         Problem problem = problemRepository.findByUuid(problemId)
                 .orElseThrow(() -> new ApplicationException("Problem not found", HttpStatus.NOT_FOUND));
-        problem.setTitle(problem.getTitle());
-        problem.setDescription(problem.getDescription());
-        problem.setDifficulty(problem.getDifficulty());
-        problem.setTags(problem.getTags());
-        problem.setTestCases(problem.getTestCases());
-        problem.setSolution(problem.getSolution());
+
+        List<TestCase> testCases = updatedProblem.testCases().stream()
+                .map(testCaseDto -> {
+                    TestCase testCase = new TestCase();
+                    testCase.setInput(testCaseDto.input());
+                    testCase.setOutput(testCaseDto.output());
+                    testCase.setProblem(problem);
+                    return testCase;
+                })
+                .toList();
+
+        Set<Tag> tags = new HashSet<>();
+        for (TagType tagType : updatedProblem.tags()) {
+            Tag tag = tagRepository.findByTagType(tagType)
+                    .orElseThrow(() -> new ApplicationException("Tag does not exist: " + tagType, HttpStatus.NOT_FOUND));
+            tags.add(tag);
+        }
+        problem.setTitle(updatedProblem.title());
+        problem.setDescription(updatedProblem.description());
+        problem.setDifficulty(updatedProblem.difficulty());
+        problem.setTags(tags);
+        problem.setTestCases(testCases);
+        problem.setSolution(updatedProblem.solution());
+        problem.setUpdatedAt(ZonedDateTime.now());
         problemRepository.save(problem);
 
     }

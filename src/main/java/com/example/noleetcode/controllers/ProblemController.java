@@ -3,6 +3,7 @@ package com.example.noleetcode.controllers;
 import com.example.noleetcode.Responses.ProblemResponse;
 import com.example.noleetcode.Responses.ProblemSummaryResponse;
 import com.example.noleetcode.dto.CreateProblemDto;
+import com.example.noleetcode.dto.UpdateProblemDto;
 import com.example.noleetcode.models.User;
 import com.example.noleetcode.services.ProblemService;
 import org.slf4j.Logger;
@@ -54,9 +55,10 @@ public class ProblemController {
     }
 
     @PutMapping("/{uuid}")
-    public ResponseEntity<ProblemResponse> updateProblem(@PathVariable UUID uuid){
+    public ResponseEntity<ProblemResponse> updateProblem(@PathVariable UUID uuid,
+                                                         @RequestBody UpdateProblemDto updatedProblem){
         logger.info("Updating problem: {}", uuid);
-        problemService.updateProblem(uuid);
+        problemService.updateProblem(uuid, updatedProblem);
         return ResponseEntity.ok().build();
     }
 
