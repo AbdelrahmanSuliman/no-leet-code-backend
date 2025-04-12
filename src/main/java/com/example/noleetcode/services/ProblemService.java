@@ -1,10 +1,9 @@
 package com.example.noleetcode.services;
 
 import com.example.noleetcode.Responses.*;
-import com.example.noleetcode.dto.UpdateProblemDto;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.example.noleetcode.config.JwtService;
 import com.example.noleetcode.dto.CreateProblemDto;
+import com.example.noleetcode.dto.UpdateProblemDto;
 import com.example.noleetcode.enums.TagType;
 import com.example.noleetcode.exception.ApplicationException;
 import com.example.noleetcode.models.Problem;
@@ -14,22 +13,20 @@ import com.example.noleetcode.models.User;
 import com.example.noleetcode.repositories.ProblemRepository;
 import com.example.noleetcode.repositories.TagRepository;
 import com.example.noleetcode.repositories.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service

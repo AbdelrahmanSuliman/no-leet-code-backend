@@ -13,12 +13,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.Map;
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +39,7 @@ public class Judge0Service {
         Map<String, Object> payload = new HashMap<>();
         payload.put("source_code", sourceCode);
         payload.put("language_id", languageId);
-        payload.put("stdin", stdin); // Input for the program (if any)
+        payload.put("stdin", stdin);
 
         // Convert payload to JSON string
         String requestJson = objectMapper.writeValueAsString(payload);

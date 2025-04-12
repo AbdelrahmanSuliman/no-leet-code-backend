@@ -37,24 +37,6 @@ public class UserProblemService {
         this.judge0Service = judge0Service;
     }
 
-    // Add imports if they are missing at the top of the file:
-    // import com.example.noleetcode.Responses.Judge0Response;
-    // import com.example.noleetcode.Responses.SubmissionResponse;
-    // import com.example.noleetcode.dto.CreateSubmissionDto;
-    // import com.example.noleetcode.enums.SubmissionStatus;
-    // import com.example.noleetcode.enums.UserProblemStatus;
-    // import com.example.noleetcode.exception.ApplicationException;
-    // import com.example.noleetcode.models.*;
-    // import com.example.noleetcode.repositories.ProblemRepository;
-    // import com.example.noleetcode.repositories.SubmissionRepository;
-    // import com.example.noleetcode.repositories.UserProblemRepository;
-    // import org.slf4j.Logger;
-    // import org.slf4j.LoggerFactory;
-    // import org.springframework.http.HttpStatus;
-    // import org.springframework.stereotype.Service;
-    // import java.time.ZonedDateTime;
-    // import java.util.UUID;
-
     /**
      * Handles the submission of code for a specific problem by a user.
      * Runs the code against test cases using Judge0 and determines the submission status.
@@ -216,9 +198,6 @@ public class UserProblemService {
                 } // End for loop
             } // End else (test cases exist)
 
-            // 6. Finalize submission status and set metrics/reason
-            if (savedSubmission == null) throw new ApplicationException("Failed to save initial submission record.", HttpStatus.INTERNAL_SERVER_ERROR);
-            if (updatedUserProblem == null) throw new ApplicationException("UserProblem record was not properly initialized.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 
             // Convert Judge0 time (seconds) to Long milliseconds for storage
