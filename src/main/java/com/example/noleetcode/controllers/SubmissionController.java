@@ -21,15 +21,11 @@ public class SubmissionController {
 
     @PostMapping("/submit")
     public ResponseEntity<SubmissionResponse> submitToProblem(
-            @AuthenticationPrincipal User User,
+            @AuthenticationPrincipal User user,
             @RequestParam UUID problemUuid,
             @RequestBody CreateSubmissionDto submissionDto) {
 
-        try {
-            SubmissionResponse submissionResponse = userProblemService.handleSubmission(User, problemUuid, submissionDto);
-            return ResponseEntity.ok(submissionResponse);  // Return a success response with submission details.
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);  // Handle errors and return an appropriate error message.
-        }
+        SubmissionResponse submissionResponse = userProblemService.handleSubmission(user, problemUuid, submissionDto);
+        return ResponseEntity.ok(submissionResponse);
     }
 }

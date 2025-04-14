@@ -12,6 +12,8 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - JUDGE0_API_KEY=${JUDGE0_API_KEY}
       - JUDGE0_API_URL=${JUDGE0_API_URL}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
     depends_on:
       - db
     networks:

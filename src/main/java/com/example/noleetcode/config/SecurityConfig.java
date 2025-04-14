@@ -42,7 +42,7 @@ public class SecurityConfig {
                     logger.info("Configuring authorization rules");
                     authorize
                             // Public endpoints for authentication
-                            .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/error").permitAll()
+                            .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/error", "/api/v1/auth/verify-email").permitAll()
 
                             .requestMatchers("/api/v1/problem/add").hasAuthority("ROLE_ADMIN")
                             // Secure API endpoints

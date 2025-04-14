@@ -46,6 +46,22 @@ public class User implements UserDetails {
     @Column
     private ZonedDateTime updatedAt = ZonedDateTime.now();
 
+    @Column(name = "email_verification_code")
+    private String emailVerificationCode;
+
+    @Column(name = "email_verification_code_expiry")
+    private ZonedDateTime emailVerificationCodeExpiry;
+
+    @Column(name = "is_email_verified", nullable = false)
+    private boolean isEmailVerified = false;
+
+    @Column(name = "password_reset_token")
+    private String passwordResetCode;
+
+    @Column(name = "password_reset_token_expiry")
+    private ZonedDateTime passwordResetCodeExpiry;
+
+
     public User(String username, String email, String password) {
         this.username = username;
         this.uuid = UUID.randomUUID();
@@ -159,5 +175,45 @@ public class User implements UserDetails {
 
     public void setUpdatedAt(ZonedDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public ZonedDateTime getEmailVerificationCodeExpiry() {
+        return emailVerificationCodeExpiry;
+    }
+
+    public void setEmailVerificationCodeExpiry(ZonedDateTime emailVerificationCodeExpiry) {
+        this.emailVerificationCodeExpiry = emailVerificationCodeExpiry;
+    }
+
+    public String getEmailVerificationCode() {
+        return emailVerificationCode;
+    }
+
+    public void setEmailVerificationCode(String emailVerificationCode) {
+        this.emailVerificationCode = emailVerificationCode;
+    }
+
+    public boolean isEmailVerified() {
+        return isEmailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        isEmailVerified = emailVerified;
+    }
+
+    public String getPasswordResetCode() {
+        return passwordResetCode;
+    }
+
+    public void setPasswordResetCode(String passwordResetToken) {
+        this.passwordResetCode = passwordResetToken;
+    }
+
+    public ZonedDateTime getPasswordResetCodeExpiry() {
+        return passwordResetCodeExpiry;
+    }
+
+    public void setPasswordResetCodeExpiry(ZonedDateTime passwordResetTokenExpiry) {
+        this.passwordResetCodeExpiry = passwordResetTokenExpiry;
     }
 }

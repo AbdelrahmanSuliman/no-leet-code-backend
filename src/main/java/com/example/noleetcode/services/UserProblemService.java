@@ -98,7 +98,6 @@ public class UserProblemService {
 
             if (problem.getTestCases() == null || problem.getTestCases().isEmpty()) {
                 logger.warn("Problem {} has no test cases. Marking submission {} as ACCEPTED.", problemUuid, savedSubmission.getUuid());
-                allPassed = true; // Pass if no tests defined
             } else {
                 logger.info("Processing {} test cases for submission {}", problem.getTestCases().size(), savedSubmission.getUuid());
                 for (TestCase testCase : problem.getTestCases()) {
@@ -148,7 +147,6 @@ public class UserProblemService {
                             } else if (stdErr != null && !stdErr.isBlank()) { // Runtime Error or other errors with stderr output
                                 failureReason += ". Stderr: " + stdErr.trim();
                             }
-                            // Add more specific checks based on status IDs if needed (e.g., Time Limit Exceeded)
                             logger.warn("Test case {} failed execution in Judge0. Reason: {}", testCase.getUuid(), failureReason);
                             break; // Stop on first execution error reported by Judge0
                         }
