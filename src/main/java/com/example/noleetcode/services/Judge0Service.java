@@ -2,7 +2,10 @@ package com.example.noleetcode.services;
 
 import com.example.noleetcode.Responses.Judge0Response;
 import com.example.noleetcode.enums.Language;
+import com.example.noleetcode.enums.SubmissionStatus;
+import com.example.noleetcode.models.Submission;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +60,12 @@ public class Judge0Service {
         HttpResponse<String> response =
                 client.send(request, HttpResponse.BodyHandlers.ofString());
 
+        int statusCode = response.statusCode();
+        String responseBody = response.body();
+
+        logger.info("Judge0 API Response Status Code: {}", statusCode); // Log status code
+        logger.info("Judge0 API Raw Response Body: {}", responseBody);
+
         // Parse the JSON response into our Judge0Response object
         return objectMapper.readValue(response.body(), Judge0Response.class);
     }
@@ -75,10 +84,25 @@ public class Judge0Service {
             case JAVASCRIPT -> 102; // JavaScript (Node.js 22.08.0)
             case RUBY -> 72;        // Ruby (2.7.0)
             case PHP -> 98;         // PHP (8.3.11)
-            default -> {
-                logger.error("Unsupported language for Judge0 mapping: {}", language);
-                throw new IllegalArgumentException("Unsupported language: " + language);
-            }
+        };
+    }
+    public SubmissionStatus mapJudge0Status(int judge0StatusId) {
+        return switch (judge0StatusId) {
+            case 1 -> SubmissionStatus.PENDING;
+            case 2 -> SubmissionStatus.RUNNING;
+            case 3 -> SubmissionStatus.ACCEPTED;
+            case 4 -> SubmissionStatus.WRONG_ANSWER;
+            case 5 -> SubmissionStatus.TIME_LIMIT_EXCEEDED; // Correct
+            case 6 -> SubmissionStatus.COMPILATION_ERROR; // Correct
+            case 7,
+                 8,
+                 9,
+                 10,
+                 11,
+                 12,
+                 14 -> SubmissionStatus.RUNTIME_ERROR;
+            case 13 -> SubmissionStatus.INTERNAL_ERROR;
+            default -> SubmissionStatus.RUNTIME_ERROR;
         };
     }
 

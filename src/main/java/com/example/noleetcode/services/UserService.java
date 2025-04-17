@@ -15,6 +15,6 @@ public class UserService {
     public UserRepository userRepository;
 
     public List<UserProblem> getUserProblemsPaginated(){
-
+        return null;
     }
 }

@@ -26,33 +26,15 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterUserDto registerUserDto) {
 
-        authService.register(registerUserDto);
-        return ResponseEntity.ok("Registration successful. Please check your email to verify your account.");
-    }
-
-
-    @PostMapping("/verify-email")
-    public ResponseEntity<String> verifyEmail(@RequestBody VerifyEmailDto verifyEmailDto) {
-        String token = authService.verifyEmail(verifyEmailDto);
+        String token = authService.register(registerUserDto);
         return ResponseEntity.ok(token);
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginUserDto loginUserDto) {
         String token = authService.login(loginUserDto);
         return ResponseEntity.ok(token);
-    }
-
-    @PostMapping("/request-password-reset")
-    public ResponseEntity<?> requestPasswordReset(@RequestParam String email) {
-        authService.requestPasswordReset(email);
-        return ResponseEntity.ok("If an account with that email exists, a password reset code has been sent.");
-    }
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordWithCodeDto resetDto) {
-        authService.resetPassword(resetDto);
-        return ResponseEntity.ok("Password has been successfully reset.");
     }
 
 

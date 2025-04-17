@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "test_cases")
@@ -13,17 +14,15 @@ public class TestCase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // Internal ID
 
-    @Column(unique = true, nullable = false, updatable = false) // Added updatable = false assuming UUID is set once
+    @Column(unique = true, nullable = false, updatable = false)
     private UUID uuid;
 
-    // Removed @ElementCollection
-    @Column(nullable = false, columnDefinition = "TEXT") // Use TEXT or jsonb for PostgreSQL
-    @Convert(converter = ObjectListConverter.class)  // Keep the converter
+    @Column(nullable = false, columnDefinition = "TEXT")
+    @Convert(converter = ObjectListConverter.class)
     private List<Object> input;
 
-    // Removed @ElementCollection
-    @Column(nullable = false, columnDefinition = "TEXT") // Use TEXT or jsonb for PostgreSQL
-    @Convert(converter = ObjectListConverter.class)  // Keep the converter
+    @Column(nullable = false, columnDefinition = "TEXT")
+    @Convert(converter = ObjectListConverter.class)
     private List<Object> output;
 
     @ManyToOne
@@ -40,8 +39,6 @@ public class TestCase {
         this.output = output;
     }
 
-    // Make sure problem is set when creating TestCase instance in ProblemService
-    // Add pre-persist logic if needed or ensure UUID is set before saving
 
     @PrePersist // Ensure UUID is set before persisting if not done elsewhere
     public void ensureUuid() {
@@ -51,7 +48,6 @@ public class TestCase {
     }
 
 
-    // Getters and Setters remain the same...
 
     public Long getId() {
         return id;
@@ -91,5 +87,42 @@ public class TestCase {
 
     public void setProblem(Problem problem) {
         this.problem = problem;
+    }
+
+    public String getFormattedInputString() {
+        if (this.input == null || this.input.isEmpty()) {
+            return "";
+        }
+
+        return this.input.stream()
+                .map(obj -> {
+                    if (obj instanceof List<?> list) {
+                        // If it's a list, join its elements' string representations with spaces
+                        return list.stream()
+                                .map(element -> element == null ? "" : element.toString())
+                                .collect(Collectors.joining(" ")); // Join elements with a single space
+                    } else {
+                        return obj == null ? "" : obj.toString();
+                    }
+                })
+                .collect(Collectors.joining("\n")); // Join each processed element/line with a newline
+    }
+
+    public String getFormattedOutputString(){
+        if (this.output == null || this.output.isEmpty()) {
+            return "";
+        }
+        return this.output.stream()
+                .map(obj -> {
+                    if(obj instanceof List<?> list){
+                        return list.stream()
+                                .map(element -> element == null ? "" : element.toString())
+                                .collect(Collectors.joining(" "));
+                    }else{
+                        return obj == null ? "" : obj.toString();
+                    }
+
+                })
+                .collect(Collectors.joining(" "));
     }
 }

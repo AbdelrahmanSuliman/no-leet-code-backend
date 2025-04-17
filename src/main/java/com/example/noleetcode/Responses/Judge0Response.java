@@ -1,37 +1,24 @@
 package com.example.noleetcode.Responses;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty; // Import if using @JsonProperty
+import com.fasterxml.jackson.annotation.JsonProperty; // Import if needed for specific mapping
 
+// Ignore fields in the JSON that are not defined in this record (like 'token', 'message')
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Judge0Response {
-    private String stdout;
-    private String stderr;
-    private String compile_output;
+public record Judge0Response(
+        String stdout,
+        String stderr,
+        @JsonProperty("compile_output")
+        String compileOutput,
+        Judge0Status status,
+        String time,
+        Integer memory
+) {
 
-    @JsonProperty("status_id") // Map JSON "status_id" to this field
-    private int statusId;
-
-    private Double time;
-    private Integer memory;
-
-    public String getStdout() { return stdout; }
-    public void setStdout(String stdout) { this.stdout = stdout; }
-
-    public String getStderr() { return stderr; }
-    public void setStderr(String stderr) { this.stderr = stderr; }
-
-    public String getCompile_output() { return compile_output; }
-    public void setCompile_output(String compile_output) { this.compile_output = compile_output; }
-
-    // Getter and Setter for statusId
-    public int getStatusId() { return statusId; }
-    public void setStatusId(int statusId) { this.statusId = statusId; }
-
-
-    public Double getTime() { return time; }
-    public void setTime(Double time) { this.time = time; }
-
-    public Integer getMemory() { return memory; }
-    public void setMemory(Integer memory) { this.memory = memory; }
+    // Nested record to represent the "status" object in the JSON
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record Judge0Status(
+            Integer id,
+            String description
+    ) {}
 }
