@@ -9,7 +9,7 @@ import com.example.noleetcode.models.Submission;
 import com.example.noleetcode.models.TestCase;
 import com.example.noleetcode.models.User;
 import com.example.noleetcode.repositories.ProblemRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.noleetcode.repositories.SubmissionRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +29,15 @@ public class SubmissionService {
     private final Judge0Service judge0Service;
 
     private static final Logger logger = LoggerFactory.getLogger(SubmissionService.class);
+    private final SubmissionRepository submissionRepository;
+    private final UserProblemService userProblemService;
 
 
-    ObjectMapper mapper = new ObjectMapper();
-
-    public SubmissionService(ProblemRepository problemRepository, Judge0Service judge0Service) {
+    public SubmissionService(ProblemRepository problemRepository, Judge0Service judge0Service, SubmissionRepository submissionRepository, UserProblemService userProblemService) {
         this.problemRepository = problemRepository;
         this.judge0Service = judge0Service;
+        this.submissionRepository = submissionRepository;
+        this.userProblemService = userProblemService;
     }
 
 
@@ -54,6 +56,11 @@ public class SubmissionService {
                         new RuntimeException("Problem not found"));
 
         submission.setProblem(problem);
+
+        //Save early in case judge0 fails, we still have a submission record
+        Submission savedSubmission = submissionRepository.save(submission);
+        logger.info("Saved initial submission record with UUID: {}", savedSubmission.getUuid());
+
         int languageId = judge0Service.getJudge0LanguageId(submission.getLanguage());
 
         List<TestCase> testCases = problem.getTestCases();
@@ -76,7 +83,7 @@ public class SubmissionService {
         logger.info("Received {} results from Judge0 for problem UUID {}", results.size(), problemUuid);
 
         SubmissionStatus finalStatus = SubmissionStatus.ACCEPTED;
-        String failureReason = null;
+        String failureReason = "";
         long maxTime = 0L;
         long maxMemory = 0L;
         int testCaseIndex = 0;
@@ -96,7 +103,7 @@ public class SubmissionService {
                 maxMemory = Math.max(maxMemory, result.memory());
             }
 
-            //Handles compile and error outputs
+            //Handles compilation and error outputs
             if(result.status() == null || result.status().id() == null || result.status().id() != 3) {
                 int statusId = (result.status() != null && result.status().id() != null) ? result.status().id() : -1; // Default ID if null
                 finalStatus = judge0Service.mapJudge0Status(statusId); // Map the Judge0 status ID
@@ -121,26 +128,29 @@ public class SubmissionService {
 
             logger.debug("Comparing outputs for test case index {}:\nExpected: '{}'\nActual:   '{}'", testCaseIndex - 1, expectedOutput, actualOutput);
 
-            //Wrong answer check
+            //Handles Wrong Answers
             if(!actualOutput.equals(expectedOutput)){
                 finalStatus = SubmissionStatus.WRONG_ANSWER;
                 failureReason = String.format("Test case %d failed: Wrong Answer", testCaseIndex);
                 logger.warn("Submission failed on test case {}. Reason: Wrong Answer. Expected: '{}', Got: '{}'", testCaseIndex, expectedOutput, actualOutput);
-
-                return new SubmissionResponse(
-                        submission.getUuid(),
-                        submission.getLanguage(),
-                        finalStatus, // REJECTED or WRONG_ANSWER
-                        failureReason,
-                        maxTime, // Time accumulated so far
-                        maxMemory // Memory accumulated so far
-                );
             }
             logger.debug("Test case index {} passed.", testCaseIndex - 1);
 
 
         }
         logger.info("All {} test cases passed for submission UUID {}", testCases.size(), submission.getUuid());
+
+        savedSubmission.setSubmissionStatus(finalStatus);
+        savedSubmission.setFailureReason(failureReason);
+        savedSubmission.setTimeTaken(maxTime);
+        savedSubmission.setMemoryUsed(maxMemory);
+
+        Submission finalSubmission = submissionRepository.save(savedSubmission);
+        logger.info("Saved final submission record with UUID: {}", finalSubmission.getUuid());
+
+        userProblemService.addSubmissionToUserProblem(user, problemUuid, finalSubmission);
+
+        //All test cases passed so no failure reason and accepted by default
         return new SubmissionResponse(
                 submission.getUuid(),
                 submission.getLanguage(),
