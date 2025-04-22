@@ -1,11 +1,8 @@
 package com.example.noleetcode.services;
 
-import com.example.noleetcode.models.UserProblem;
 import com.example.noleetcode.repositories.UserProblemRepository;
 import com.example.noleetcode.repositories.UserRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class UserService {
@@ -14,7 +11,9 @@ public class UserService {
 
     public UserRepository userRepository;
 
-    public List<UserProblem> getUserProblemsPaginated(){
-        return null;
+    public UserService(UserProblemRepository userProblemRepository, UserRepository userRepository) {
+        this.userProblemRepository = userProblemRepository;
+        this.userRepository = userRepository;
     }
+
 }

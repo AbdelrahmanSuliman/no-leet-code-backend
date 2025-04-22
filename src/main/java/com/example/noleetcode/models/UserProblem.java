@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user_problems")
@@ -18,6 +19,9 @@ public class UserProblem {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "problem_id")
     private Problem problem;
@@ -28,7 +32,8 @@ public class UserProblem {
     @Column
     private Integer numberOfAttempts = 0;
 
-    @Column
+    @Enumerated(EnumType.STRING)
+    @Column(name = "last_submission_status")
     private UserProblemStatus lastSubmissionStatus;
 
     @Column
@@ -40,7 +45,9 @@ public class UserProblem {
     @OneToMany(mappedBy = "userProblem", cascade = CascadeType.ALL)
     private List<Submission> submissions;
 
-    public UserProblem() {}
+    public UserProblem() {
+        this.uuid = UUID.randomUUID();
+    }
 
     public UserProblem(List<Submission> submissions, UserProblemStatus lastSubmissionStatus, Integer numberOfAttempts, boolean solved, Problem problem, User user) {
         this.submissions = submissions;
@@ -49,6 +56,7 @@ public class UserProblem {
         this.solved = solved;
         this.problem = problem;
         this.user = user;
+
     }
 
     public Long getId() {

@@ -14,11 +14,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("api/v1/submission")
 public class SubmissionController {
-    private final UserProblemService userProblemService;
     private final SubmissionService submissionService;
 
     public SubmissionController(UserProblemService userProblemService, SubmissionService submissionService) {
-        this.userProblemService = userProblemService;
         this.submissionService = submissionService;
     }
 

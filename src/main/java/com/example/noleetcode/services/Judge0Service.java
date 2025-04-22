@@ -92,8 +92,8 @@ public class Judge0Service {
             case 2 -> SubmissionStatus.RUNNING;
             case 3 -> SubmissionStatus.ACCEPTED;
             case 4 -> SubmissionStatus.WRONG_ANSWER;
-            case 5 -> SubmissionStatus.TIME_LIMIT_EXCEEDED; // Correct
-            case 6 -> SubmissionStatus.COMPILATION_ERROR; // Correct
+            case 5 -> SubmissionStatus.TIME_LIMIT_EXCEEDED;
+            case 6 -> SubmissionStatus.COMPILATION_ERROR;
             case 7,
                  8,
                  9,

@@ -65,20 +65,17 @@ public class ProblemService {
                     return new ApplicationException("Problem not found", HttpStatus.NOT_FOUND);
                 });
 
-        // --- Map Tags ---
         Set<TagResponse> tagResponses = problem.getTags().stream()
                 .map(tag -> new TagResponse(tag.getTagType()))
                 .collect(Collectors.toSet());
 
-        // --- Map TestCases ---
         List<TestCaseResponse> testCaseResponses = problem.getTestCases().stream()
-                .map(TestCaseResponse::fromTestCase) // Use factory method or: new TestCaseResponse(tc.getUuid(), tc.getInput(), tc.getOutput())
+                .map(TestCaseResponse::fromTestCase)
                 .collect(Collectors.toList());
 
-        // --- Map UserProblems ---
         List<UserProblemResponse> userProblemResponses = problem.getUserProblems().stream()
-                .filter(up -> up.getUser() != null) // Optional: safety check
-                .map(UserProblemResponse::fromUserProblem) // Use factory method or explicit constructor
+                .filter(up -> up.getUser() != null)
+                .map(UserProblemResponse::fromUserProblem)
                 .collect(Collectors.toList());
 
         return new ProblemResponse(
@@ -86,9 +83,9 @@ public class ProblemService {
                 problem.getTitle(),
                 problem.getDescription(),
                 problem.getDifficulty(),
-                userProblemResponses,     // <-- Use mapped DTO list
-                tagResponses,             // <-- Use mapped DTO set
-                testCaseResponses,        // <-- Use mapped DTO list
+                userProblemResponses,
+                tagResponses,
+                testCaseResponses,
                 problem.getSolution(),
                 problem.getCreatedAt(),
                 problem.getUpdatedAt()
@@ -129,7 +126,6 @@ public class ProblemService {
 
 
 
-        // --- Create Problem entity (without test cases initially) ---
         Problem problem = new Problem();
         problem.setTitle(createProblemDto.title());
         problem.setDescription(createProblemDto.description());
@@ -138,10 +134,8 @@ public class ProblemService {
         problem.setAuthor(author);
         problem.setTags(tags);
 
-        // --- End: Create Problem entity ---
 
 
-        // --- Process test cases and set the relationship ---
         if (createProblemDto.testCases() == null || createProblemDto.testCases().isEmpty()) {
             throw new ApplicationException("Test cases cannot be empty", HttpStatus.BAD_REQUEST);
         }

@@ -41,7 +41,6 @@ public class SubmissionService {
     }
 
 
-    @Transactional
     public SubmissionResponse processSubmission(User user, UUID problemUuid, CreateSubmissionDto submissionDto) {
         Submission submission = new Submission();
         submission.setUser(user);
@@ -49,7 +48,6 @@ public class SubmissionService {
         submission.setLanguage(submissionDto.language());
         submission.setSubmittedAt(ZonedDateTime.now());
 
-        //TODO: Handle updating userproblem with the submission
 
         Problem problem = problemRepository.findByUuid(problemUuid)
                 .orElseThrow(() ->
@@ -57,9 +55,6 @@ public class SubmissionService {
 
         submission.setProblem(problem);
 
-        //Save early in case judge0 fails, we still have a submission record
-        Submission savedSubmission = submissionRepository.save(submission);
-        logger.info("Saved initial submission record with UUID: {}", savedSubmission.getUuid());
 
         int languageId = judge0Service.getJudge0LanguageId(submission.getLanguage());
 
@@ -72,6 +67,7 @@ public class SubmissionService {
             try {
                 for( TestCase tc : testCases) {
                     logger.debug("Running test case UUID: {}", tc.getUuid());
+                    //TODO: wrap submission.getCode() in some sort of boilerplate code according to the language
                     results.add(judge0Service.submitToJudge0AndGetResult(submission.getCode(), languageId,tc.getFormattedInputString()));
                 }
             } catch (IOException | InterruptedException e) {
@@ -140,15 +136,15 @@ public class SubmissionService {
         }
         logger.info("All {} test cases passed for submission UUID {}", testCases.size(), submission.getUuid());
 
-        savedSubmission.setSubmissionStatus(finalStatus);
-        savedSubmission.setFailureReason(failureReason);
-        savedSubmission.setTimeTaken(maxTime);
-        savedSubmission.setMemoryUsed(maxMemory);
+        submission.setSubmissionStatus(finalStatus);
+        submission.setFailureReason(failureReason);
+        submission.setTimeTaken(maxTime);
+        submission.setMemoryUsed(maxMemory);
 
-        Submission finalSubmission = submissionRepository.save(savedSubmission);
-        logger.info("Saved final submission record with UUID: {}", finalSubmission.getUuid());
+        submissionRepository.save(submission);
+        logger.info("Saved final submission record with UUID: {}", submission.getUuid());
 
-        userProblemService.addSubmissionToUserProblem(user, problemUuid, finalSubmission);
+        userProblemService.addSubmissionToUserProblem(user, problemUuid, submission);
 
         //All test cases passed so no failure reason and accepted by default
         return new SubmissionResponse(
