@@ -2,11 +2,8 @@ package com.example.noleetcode.services;
 
 import com.example.noleetcode.config.AppConfig;
 import com.example.noleetcode.config.JwtService;
-import com.example.noleetcode.config.SecurityConfig;
 import com.example.noleetcode.dto.LoginUserDto;
 import com.example.noleetcode.dto.RegisterUserDto;
-import com.example.noleetcode.dto.ResetPasswordWithCodeDto;
-import com.example.noleetcode.dto.VerifyEmailDto;
 import com.example.noleetcode.exception.ApplicationException;
 import com.example.noleetcode.models.User;
 import com.example.noleetcode.repositories.UserRepository;
@@ -15,9 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.ZonedDateTime;
-import java.util.UUID;
 
 
 @Service
@@ -32,7 +26,7 @@ public class AuthService {
 
 
 
-    public AuthService(UserRepository userRepository, SecurityConfig securityConfig, JwtService jwtService, AppConfig appConfig, BCryptPasswordEncoder passwordEncoder, MailService mailService) {
+    public AuthService(UserRepository userRepository, JwtService jwtService, AppConfig appConfig, BCryptPasswordEncoder passwordEncoder, MailService mailService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;

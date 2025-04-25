@@ -3,6 +3,7 @@ package com.example.noleetcode.services;
 import com.example.noleetcode.Responses.Judge0Response;
 import com.example.noleetcode.Responses.SubmissionResponse;
 import com.example.noleetcode.dto.CreateSubmissionDto;
+import com.example.noleetcode.enums.Language;
 import com.example.noleetcode.enums.SubmissionStatus;
 import com.example.noleetcode.models.Problem;
 import com.example.noleetcode.models.Submission;
@@ -40,6 +41,166 @@ public class SubmissionService {
         this.userProblemService = userProblemService;
     }
 
+    public String getBoilerPlateCode(String userCode, Language language) {
+        // Define boilerplate templates with a placeholder for user code
+        // *** Corrected Java Template for "Calculate Average" problem ***
+        String javaBoilerplateTemplate = """
+                import java.util.*;
+                import java.io.*;
+                import java.text.DecimalFormat; // Needed by user code
+
+                // --- User's Solution Class/Code START ---
+                // __USER_CODE_HERE__
+                // --- User's Solution Class/Code END ---
+
+                // Main execution harness
+                public class Main {
+                    public static void main(String[] args) {
+                        Scanner scanner = new Scanner(System.in);
+                        Solution userSolution = new Solution(); // Instantiate user's class
+
+                        // --- Read all input lines ---
+                        List<String> inputLines = new ArrayList<>();
+                        while(scanner.hasNextLine()){
+                           inputLines.add(scanner.nextLine());
+                        }
+
+                        // --- Call user's solve method ---
+                        String result = userSolution.solve(inputLines); // Call the solve method
+
+                        // --- Print the String result returned by solve ---
+                        System.out.println(result);
+
+                        scanner.close();
+                    }
+                }
+                """;
+
+        // --- Keep other language templates as they were, or adapt them similarly ---
+        String pythonBoilerplateTemplate = """
+                import sys
+                import json # Or other libraries for serialization if needed
+
+                # --- User's Function/Class START ---
+                # __USER_CODE_HERE__
+                # --- User's Function/Class END ---
+
+                if __name__ == "__main__":
+                    # --- TODO: Adapt Input Reading/Parsing based on Problem ---
+                    input_lines = sys.stdin.read().splitlines()
+                    # Example: Parse two integers
+                    # a = int(input_lines[0])
+                    # b = int(input_lines[1])
+
+                    # --- TODO: Instantiate user's solution (if class-based) ---
+                    # solution = Solution()
+
+                    # --- TODO: Call user's function/method ---
+                    # Example:
+                    # result = solve(a, b) # If it's a global function 'solve'
+                    # result = solution.solve(a, b) # If it's a method in Solution class
+
+                    # --- TODO: Serialize and print the result to standard output ---
+                    # Example: print simple result
+                    # print(result)
+                    # Example: print list as JSON (common for list results)
+                    # print(json.dumps(result))
+
+                    # --- Placeholder: Print input back (REMOVE/REPLACE THIS) ---
+                    for line in input_lines:
+                        print(line)
+                    # --- End Placeholder ---
+                """;
+
+        String cBoilerplateTemplate = """
+                #include <stdio.h>
+                #include <stdlib.h>
+                #include <string.h>
+
+                // --- User's Function/Code START ---
+                // __USER_CODE_HERE__
+                // --- User's Function/Code END ---
+
+                int main() {
+                    // --- TODO: Adapt Input Reading based on Problem ---
+                    // Example: Read two integers
+                    // int a, b;
+                    // scanf("%d %d", &a, &b);
+
+                    // --- TODO: Call user's function ---
+                    // Example:
+                    // int result = solve(a, b); // Adjust function signature
+
+                    // --- TODO: Print the result to standard output ---
+                    // Example:
+                    // printf("%d\\n", result); // Adjust format specifier
+
+                    // --- Placeholder: Read and print lines (REMOVE/REPLACE THIS) ---
+                     char buffer[1024];
+                     while (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+                         printf("%s", buffer);
+                     }
+                    // --- End Placeholder ---
+
+                    return 0;
+                }
+                """;
+
+        String cppBoilerplateTemplate = """
+                #include <iostream>
+                #include <vector>
+                #include <string>
+                #include <sstream>
+
+                // --- User's Function/Class START ---
+                // __USER_CODE_HERE__
+                // --- User's Function/Class END ---
+
+                int main() {
+                    std::ios_base::sync_with_stdio(false);
+                    std::cin.tie(NULL);
+
+                    // --- TODO: Adapt Input Reading based on Problem ---
+                    // Example: Read two integers
+                    // int a, b;
+                    // std::cin >> a >> b;
+
+                    // --- TODO: Instantiate user's solution (if needed) ---
+                    // Solution userSolution;
+
+                    // --- TODO: Call user's method/function ---
+                    // Example:
+                    // auto result = userSolution.solve(a, b); // Adjust signature
+
+                    // --- TODO: Print the result to standard output ---
+                    // Example:
+                    // std::cout << result << std::endl; // Adjust if result is vector, etc.
+
+                    // --- Placeholder: Read and print lines (REMOVE/REPLACE THIS) ---
+                     std::string line;
+                     while (std::getline(std::cin, line)) {
+                         std::cout << line << std::endl;
+                     }
+                    // --- End Placeholder ---
+
+                    return 0;
+                }
+                """;
+
+        // Use String.replace to insert the user's code into the template
+        return switch (language) {
+            case JAVA -> javaBoilerplateTemplate.replace("// __USER_CODE_HERE__", userCode);
+            case PYTHON -> pythonBoilerplateTemplate.replace("# __USER_CODE_HERE__", userCode);
+            case C -> cBoilerplateTemplate.replace("// __USER_CODE_HERE__", userCode);
+            case CPP -> cppBoilerplateTemplate.replace("// __USER_CODE_HERE__", userCode);
+            // Handle other languages or return original code if no template exists
+            default -> {
+                logger.warn("No boilerplate template defined for language: {}. Sending raw code.", language);
+                yield userCode; // Return original code if no template
+            }
+        };
+    };
+
 
     public SubmissionResponse processSubmission(User user, UUID problemUuid, CreateSubmissionDto submissionDto) {
         Submission submission = new Submission();
@@ -67,8 +228,7 @@ public class SubmissionService {
             try {
                 for( TestCase tc : testCases) {
                     logger.debug("Running test case UUID: {}", tc.getUuid());
-                    //TODO: wrap submission.getCode() in some sort of boilerplate code according to the language
-                    results.add(judge0Service.submitToJudge0AndGetResult(submission.getCode(), languageId,tc.getFormattedInputString()));
+                    results.add(judge0Service.submitToJudge0AndGetResult(getBoilerPlateCode(submission.getCode(), submission.getLanguage()), languageId,tc.getFormattedInputString()));
                 }
             } catch (IOException | InterruptedException e) {
                 Thread.currentThread().interrupt();
