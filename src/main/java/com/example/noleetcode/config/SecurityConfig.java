@@ -43,7 +43,6 @@ public class SecurityConfig {
                     authorize
                             // Public endpoints for authentication
                             .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/error", "/api/v1/auth/verify-email").permitAll()
-
                             .requestMatchers("/api/v1/problem/add").hasAuthority("ROLE_ADMIN")
                             // Secure API endpoints
                             .requestMatchers("/api/v1/**").authenticated()
@@ -52,8 +51,7 @@ public class SecurityConfig {
                 })
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // Make sure the AuthenticationProvider is configured if you are using it directly
-                .authenticationProvider(authenticationProvider) // Ensure authenticationProvider bean exists and is injected
+                .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -62,7 +60,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));  // Allow frontend to access API
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin",
                 "Access-Control-Request-Method", "Access-Control-Request-Headers"));
